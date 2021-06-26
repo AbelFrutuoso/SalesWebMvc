@@ -23,10 +23,10 @@ namespace SalesWebMVC.Controllers
 
         public async Task<IActionResult> SimpleSearch(DateTime? minDate, DateTime? maxDate)
         {
-            minDate=minDate.HasValue? minDate: new DateTime(DateTime.Now.Year, 1, 1);
-            maxDate = maxDate.HasValue ? maxDate : DateTime.Now;
+            minDate = SetMinDate(minDate);
+            maxDate = SetMaxDate(maxDate);
 
-            ViewData["minDate"] = minDate.Value.ToString("dd/MM/yyyy");
+            ViewData["minDate"] = minDate.Value.ToString("yyyy/MM/dd");
             ViewData["maxDate"] = maxDate.Value.ToString("yyyy/MM/dd");
 
             var result = await _sallesRecordService.FindByDateAsync(minDate, maxDate);
@@ -34,9 +34,28 @@ namespace SalesWebMVC.Controllers
             return View(result);
         }
 
-        public IActionResult GroupingSearch()
+        public async Task<IActionResult> GroupingSearch(DateTime? minDate, DateTime? maxDate)
         {
-            return View();
+            minDate = SetMinDate(minDate);
+            maxDate = SetMaxDate(maxDate);
+
+            ViewData["minDate"] = minDate.Value.ToString("yyyy/MM/dd");
+            ViewData["maxDate"] = maxDate.Value.ToString("yyyy/MM/dd");
+
+            var result = await _sallesRecordService.FindByDateGroupingAsync(minDate, maxDate);
+
+            return View(result);
         }
+
+        private DateTime SetMinDate (DateTime? minDate)
+        {
+            return (DateTime)(minDate.HasValue ? minDate : new DateTime(DateTime.Now.Year, 1, 1));
+        }
+
+        private DateTime SetMaxDate(DateTime? maxDate)
+        {
+            return (DateTime)(maxDate.HasValue ? maxDate : DateTime.Now);
+        }
+
     }
 }
